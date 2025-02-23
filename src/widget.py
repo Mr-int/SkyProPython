@@ -27,6 +27,8 @@ def mask_account_card(card_data: Union[str]) -> str:
 
 
 def get_date(date: str) -> str:
+    """ функция принимает на вход строку с датой в формате
+    2024-03-11T02:26:18.671407  и возвращает строку с датой в формате ДД.ММ.ГГГГ"""
     index = date.index("T")
     date = date[:index]
     date_array = date.split("-")
