@@ -1,7 +1,9 @@
+from typing import Union
+
 from masks import get_mask_account, get_mask_card_number
 
 
-def mask_account_card(card_data: str) -> str:
+def mask_account_card(card_data: Union[str]) -> str:
     """Обрабатывает информацию как о картах, так и о счетах
     Возвращает строку с замаскированным номером"""
     card_data = card_data.strip()
@@ -24,5 +26,11 @@ def mask_account_card(card_data: str) -> str:
     return mask_card_data
 
 
+def get_date(date: str) -> str:
+    index = date.index("T")
+    date = date[:index]
+    date_array = date.split("-")
 
+    date_reforming = ".".join(reversed(date_array))
 
+    return date_reforming
