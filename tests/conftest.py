@@ -1,6 +1,7 @@
 import pytest
 
 
+# Фикстуры для test_masks.py
 @pytest.fixture
 def masks_card_1():
     return "7000 79** **** 6361"

@@ -27,8 +27,16 @@ def get_mask_account(card_accaunt: Union[int, str]) -> str:
     """Маскирует номер счета"""
     card_accaunt = str(card_accaunt)
     card_accaunt = card_accaunt.strip()
+
+    if len(card_accaunt) < 20:
+        return "Некорректный номер счета"
+
+    for i in card_accaunt:
+        if i.isdigit():
+            pass
+        else:
+            return "Некорректный номер счета"
+
     mask_card_accaunt = "**" + card_accaunt[-4::]
 
     return mask_card_accaunt
-
-print(get_mask_card_number(1.2))
