@@ -3,9 +3,9 @@ import os.path
 
 
 def get_transaction(path_to_json):
-    if not os.path.getsize(path_to_json) == 0:
+    if os.path.getsize(path_to_json) == 0:
         return []
-    if os.path.isfile(path_to_json):
+    if not os.path.isfile(path_to_json):
         return []
 
     try:
