@@ -10,9 +10,11 @@ def log(filename=None):
 
             try:
                 result = func(*args, **kwargs)
-                log_msg += f"Function '{func.__name__}' finished successfully with: {result}\n"
+                log_msg += (
+                    f"Function '{func.__name__}' finished successfully with: {result}\n"
+                )
                 if filename:
-                    with open(filename, 'a') as f:
+                    with open(filename, "a") as f:
                         f.write(log_msg)
                 else:
                     print(log_msg)
@@ -21,7 +23,7 @@ def log(filename=None):
             except Exception as e:
                 log_msg += f"Function '{func.__name__}' raised an exception: {type(e).__name__} with args: {args}, kwargs: {kwargs}\n"
                 if filename:
-                    with open(filename, 'a') as f:
+                    with open(filename, "a") as f:
                         f.write(log_msg)
                 else:
                     print(log_msg)
