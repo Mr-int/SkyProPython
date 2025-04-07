@@ -1,10 +1,7 @@
 import pytest
 
-from src.generators import (
-    card_number_generator,
-    filter_by_currency,
-    transaction_descriptions,
-)
+from src.generators import (card_number_generator, filter_by_currency,
+                            transaction_descriptions)
 
 
 @pytest.mark.parametrize(
@@ -85,8 +82,13 @@ def test_transaction_descriptions(transactions, error_transaction_descriptions):
     output = []
     for _ in range(5):
         output.append(next(descriptions))
-    assert output == ['Перевод организации', 'Перевод со счета на счет', 'Перевод со счета на счет',
-                      'Перевод с карты на карту', 'Перевод организации']
+    assert output == [
+        "Перевод организации",
+        "Перевод со счета на счет",
+        "Перевод со счета на счет",
+        "Перевод с карты на карту",
+        "Перевод организации",
+    ]
     descriptions = transaction_descriptions([])
     assert next(descriptions) == error_transaction_descriptions
 
@@ -95,10 +97,22 @@ def test_card_number_generator():
     output = []
     for card_number in card_number_generator(1, 5):
         output.append(card_number)
-    assert output == ['0000 0000 0000 0001', '0000 0000 0000 0002', '0000 0000 0000 0003', '0000 0000 0000 0004',
-                      '0000 0000 0000 0005']
+    assert output == [
+        "0000 0000 0000 0001",
+        "0000 0000 0000 0002",
+        "0000 0000 0000 0003",
+        "0000 0000 0000 0004",
+        "0000 0000 0000 0005",
+    ]
     output = []
     for card_number in card_number_generator(9999999999999993, 9999999999999999):
         output.append(card_number)
-    assert output == ['9999 9999 9999 9993', '9999 9999 9999 9994', '9999 9999 9999 9995', '9999 9999 9999 9996', '9999 9999 9999 9997', '9999 9999 9999 9998',
-                      '9999 9999 9999 9999']
+    assert output == [
+        "9999 9999 9999 9993",
+        "9999 9999 9999 9994",
+        "9999 9999 9999 9995",
+        "9999 9999 9999 9996",
+        "9999 9999 9999 9997",
+        "9999 9999 9999 9998",
+        "9999 9999 9999 9999",
+    ]
