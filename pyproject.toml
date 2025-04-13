@@ -3,7 +3,7 @@ name = "coursework"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "neosome_college",email = "daniildaresin@gmail.com"}
+    {name = "Georgiy",email = "bakiev3005@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.13"
