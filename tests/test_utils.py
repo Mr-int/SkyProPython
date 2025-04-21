@@ -1,43 +1,55 @@
-import json
-import os
-from unittest.mock import mock_open, patch
-
 import pytest
-
-from src.utils import get_transaction
-
-
-def test_get_transaction_empty_file():
-    """Тест для пустого файла"""
-    with patch("builtins.open", mock_open(read_data="")):
-        result = get_transaction("path/to/file.json")
-        assert result == []
+from src.utils import Product, Category
 
 
-def test_get_transaction_invalid_json():
-    """Тест для невалидного JSON"""
-    with patch("builtins.open", mock_open(read_data="invalid json")):
-        result = get_transaction("path/to/file.json")
-        assert result == []
+def test_product_initialization():
+    product = Product("Test Product", "Test Description", 100.0, 10)
+
+    assert product.name == "Test Product"
+    assert product.description == "Test Description"
+    assert product.price == 100.0
+    assert product.quantity == 10
 
 
-def test_get_transaction_not_list():
-    """Тест для JSON, который не является списком"""
-    with patch("builtins.open", mock_open(read_data='{"key": "value"}')):
-        result = get_transaction("path/to/file.json")
-        assert result == []
+def test_category_initialization():
+    product1 = Product("Product 1", "Desc 1", 50.0, 5)
+    product2 = Product("Product 2", "Desc 2", 75.0, 3)
+    products = [product1, product2]
+
+    category = Category("Test Category", "Test Category Description", products)
+
+    assert category.name == "Test Category"
+    assert category.description == "Test Category Description"
+    assert category.products == products
+    assert len(category.products) == 2
 
 
-def test_get_transaction_valid_data():
-    """Тест для валидных данных"""
-    test_data = [{"id": 1, "amount": 100}, {"id": 2, "amount": 200}]
-    with patch("builtins.open", mock_open(read_data=json.dumps(test_data))):
-        result = get_transaction("path/to/file.json")
-        assert result == test_data
+def test_category_count():
+    Category.category_count = 0
+
+    product = Product("Product", "Desc", 100.0, 1)
+    category1 = Category("Cat1", "Desc1", [product])
+    category2 = Category("Cat2", "Desc2", [product])
+
+    assert Category.category_count == 2
 
 
-def test_get_transaction_file_not_found():
-    """Тест для несуществующего файла"""
-    with patch("os.path.isfile", return_value=False):
-        result = get_transaction("nonexistent.json")
-        assert result == []
+def test_product_count():
+    product1 = Product("Product 1", "Desc 1", 50.0, 5)
+    product2 = Product("Product 2", "Desc 2", 75.0, 3)
+    products = [product1, product2]
+
+    category = Category("Test Category", "Test Description", products)
+
+    assert category.product_count == 2
+    assert len(category.products) == category.product_count
+
+
+def test_empty_category():
+    category = Category("Empty Category", "No products here", [])
+
+    assert category.name == "Empty Category"
+    assert category.description == "No products here"
+    assert category.products == []
+    assert category.product_count == 0
+    assert Category.category_count > 0
