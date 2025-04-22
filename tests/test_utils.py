@@ -1,43 +1,104 @@
-import json
 import os
-from unittest.mock import mock_open, patch
+from pathlib import Path
+from typing import List
 
+import pandas as pd
 import pytest
 
-from src.utils import get_transaction
+from src.utils import load_config, read_excel_data
 
 
-def test_get_transaction_empty_file():
-    """Тест для пустого файла"""
-    with patch("builtins.open", mock_open(read_data="")):
-        result = get_transaction("path/to/file.json")
-        assert result == []
+@pytest.fixture
+def sample_excel_file(tmp_path: Path) -> str:
+    """
+    Создает временный Excel файл для тестирования.
+    """
+    df = pd.DataFrame({
+        'Номер карты': ['*1234', '*5678'],
+        'Сумма операции': [1000, -500],
+        'Статус': ['OK', 'OK']
+    })
+    file_path = tmp_path / "test.xlsx"
+    df.to_excel(file_path, index=False)
+    return str(file_path)
 
 
-def test_get_transaction_invalid_json():
-    """Тест для невалидного JSON"""
-    with patch("builtins.open", mock_open(read_data="invalid json")):
-        result = get_transaction("path/to/file.json")
-        assert result == []
+def test_read_excel_data_success(sample_excel_file: str) -> None:
+    """
+    Тест успешного чтения Excel файла.
+    """
+    result = read_excel_data(sample_excel_file)
+    assert isinstance(result, list)
+    assert len(result) == 2
+    assert all(isinstance(item, dict) for item in result)
+    assert all('Номер карты' in item for item in result)
 
 
-def test_get_transaction_not_list():
-    """Тест для JSON, который не является списком"""
-    with patch("builtins.open", mock_open(read_data='{"key": "value"}')):
-        result = get_transaction("path/to/file.json")
-        assert result == []
+def test_read_excel_data_file_not_found() -> None:
+    """Тест чтения несуществующего файла."""
+    result = read_excel_data("nonexistent.xlsx")
+    assert isinstance(result, list)
+    assert len(result) == 0
 
 
-def test_get_transaction_valid_data():
-    """Тест для валидных данных"""
-    test_data = [{"id": 1, "amount": 100}, {"id": 2, "amount": 200}]
-    with patch("builtins.open", mock_open(read_data=json.dumps(test_data))):
-        result = get_transaction("path/to/file.json")
-        assert result == test_data
+def test_load_config(monkeypatch: pytest.MonkeyPatch) -> None:
+    """
+    Тест загрузки конфигурации.
+    """
+    # Подменяем переменные окружения для теста
+    env_vars = {
+        'API_KEY': 'test_key',
+        'API_URL': 'http://test.com',
+        'DEBUG': 'true',
+        'LOG_LEVEL': 'DEBUG',
+        'DATA_DIR': './test_data',
+        'REPORT_DIR': './test_reports'
+    }
+    
+    for key, value in env_vars.items():
+        monkeypatch.setenv(key, value)
+    
+    config = load_config()
+    
+    assert config['api_key'] == 'test_key'
+    assert config['api_url'] == 'http://test.com'
+    assert config['debug'] is True
+    assert config['log_level'] == 'DEBUG'
+    assert config['data_dir'] == './test_data'
+    assert config['report_dir'] == './test_reports'
+    
+    # Проверяем создание директорий
+    assert Path(config['data_dir']).exists()
+    assert Path(config['report_dir']).exists()
 
 
-def test_get_transaction_file_not_found():
-    """Тест для несуществующего файла"""
-    with patch("os.path.isfile", return_value=False):
-        result = get_transaction("nonexistent.json")
-        assert result == []
+def test_xlsx_reader(tmp_path):
+    """Тест на корректное чтение нормального файла"""
+    df = pd.DataFrame({
+        "Номер карты": ["1234567890123456", "6543210987654321"],
+        "Имя": ["Иван", "Мария"]
+    })
+    test_file = os.path.join(tmp_path, "test.xlsx")
+    df.to_excel(test_file, index=False)
+
+    result = xlsx_reader(test_file)
+
+    assert len(result) == 2
+    assert result[0]["Номер карты"] == "1234567890123456"
+    assert result[1]["Имя"] == "Мария"
+
+
+def test_xlsx_reader_card_numbers(tmp_path):
+    """Тест на преобразование числовых номеров карт в строки"""
+    df = pd.DataFrame({
+        "Номер карты": [1234567890123456, 9876543210987654],
+        "Имя": ["Алексей", "Ольга"]
+    })
+    test_file = os.path.join(tmp_path, "testik.xlsx")
+    df.to_excel(test_file, index=False)
+
+    result = xlsx_reader(test_file)
+    assert result[0]["Номер карты"] == "1234567890123456"
+    assert result[1]["Номер карты"] == "9876543210987654"
+
+
