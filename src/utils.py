@@ -1,20 +1,31 @@
-import json
-import os.path
+from itertools import product
 
 
-def get_transaction(path_to_json):
-    if not os.path.getsize(path_to_json) == 0:
-        return []
-    if os.path.isfile(path_to_json):
-        return []
+class Product:
+    name: str
+    description: str
+    price: int
+    quantity: int
 
-    try:
-        with open(path_to_json, encoding="utf-8") as file:
-            data = json.load(file)
-            if isinstance(data, list):
-                return data
-            else:
-                return []
-    except (json.JSONDecodeError, ValueError):
-        print("Ошибка чтения json файла или неверный формат данных")
-        return []
+    def __init__(self, name, description, price, quantity):
+        self.name = name
+        self.description = description
+        self.price = price
+        self.quantity = quantity
+
+
+class Category:
+    name: str
+    description: str
+    products: list["Products"]
+
+    category_count = 0
+    product_count = 0
+
+    def __init__(self, name, description, products):
+        self.name = name
+        self.description = description
+        self.products = products
+
+        Category.category_count += 1
+        Category.product_count = len(products)
