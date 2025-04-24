@@ -1,0 +1,12 @@
+{
+    "stock_portfolio": ["AAPL", "GOOGL", "MSFT"],
+    "preferred_currency": "USD",
+    "notification_settings": {
+        "email_notifications": true,
+        "sms_notifications": false
+    },
+    "display_settings": {
+        "show_graphs": true,
+        "dark_mode": false
+    }
+} 
